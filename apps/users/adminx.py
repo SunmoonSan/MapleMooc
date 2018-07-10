@@ -4,13 +4,21 @@
 # @site  : https://github.com/SunmoonSan
 import xadmin
 from users.models import EmailVerifyRecord, Banner
+from xadmin import views
+
+
+class BaseSetting:
+    enable_themes = True
+    use_bootswatch = True
+
+
+class GlobalSettings:
+    site_title = 'Maple慕课管理系统'
+    site_footer = 'www.baidu.com'
+    menu_style = 'accordion'  # app折叠
 
 
 class EmailVerifyRecordAdmin(object):
-    # code = models.CharField(max_length=20, verbose_name=u'验证码')
-    # email = models.EmailField(max_length=50, verbose_name=u'邮箱')
-    # send_type = models.CharField(choices=(('register', u'注册'), ('forget', u'找回密码')), max_length=20, verbose_name=u'类型')
-    # send_time = models.DateTimeField(auto_now_add=True, verbose_name=u'时间')
     list_display = ['code', 'email', 'send_type', 'send_time']
     search_fields = ['code', 'email', 'send_type']
     list_filter = ['code', 'email', 'send_type', 'send_time']
@@ -24,3 +32,5 @@ class BannerAdmin(object):
 
 xadmin.site.register(EmailVerifyRecord, EmailVerifyRecordAdmin)
 xadmin.site.register(Banner, BannerAdmin)
+xadmin.site.register(views.BaseAdminView, BaseSetting)  # 注册主题
+xadmin.site.register(views.CommAdminView, GlobalSettings)  # 全局注册
