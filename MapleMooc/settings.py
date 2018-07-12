@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'xadmin',
     'crispy_forms',
-    'captcha'
+    'captcha',
+    'pure_pagination'  # 分页
 ]
 AUTH_USER_MODEL = "users.UserProfile"
 
@@ -75,6 +76,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',  # media配置
             ],
         },
     },
@@ -143,3 +145,6 @@ EMAIL_HOST_USER = '18814184179@163.com'
 EMAIL_HOST_PASSWORD = '521lxy'
 EMAIL_USE_TLS = False
 EMAIL_FROM = '18814184179@163.com'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
