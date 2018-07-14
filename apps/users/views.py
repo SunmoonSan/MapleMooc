@@ -174,8 +174,6 @@ class IndexView(View):
             "banner_courses": banner_courses,
             "course_orgs": course_orgs,
         })
-        # return render(request, 'user/index.html')
-
 
 
 
