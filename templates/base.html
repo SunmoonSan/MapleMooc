@@ -16,6 +16,7 @@
 
 </head>
 <body>
+
 <section class="headerwrap ">
     <header>
         <div class=" header">
@@ -73,25 +74,10 @@
                 </div>
             </div>
 
+        {% block nav_index %}
 
-            <nav>
-                <div class="nav">
-                    <div class="wp">
-                        <ul>
-                            <li class="active"><a href="index.html">首页</a></li>
-                            <li>
-                                <a href="{% comment %}{% url 'course:course_list' %}{% endcomment %}">
-                                    公开课<img class="hot" src="{% static 'images/nav_hot.png' %}">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="teachers-list.html">授课教师</a>
-                            </li>
-                            <li><a href="{% url 'org:org_list' %}">授课机构</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+        {% endblock %}
+
 
         </div>
     </header>
