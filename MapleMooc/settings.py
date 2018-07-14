@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'xadmin',
     'crispy_forms',
-    'captcha',
+    'captcha',  # 验证码
     'pure_pagination'  # 分页
 ]
 AUTH_USER_MODEL = "users.UserProfile"

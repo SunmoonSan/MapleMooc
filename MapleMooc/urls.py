@@ -15,29 +15,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.views.generic import TemplateView
 from django.views.static import serve
 
 import xadmin
-from organizations.views import OrgView
 from MapleMooc.settings import MEDIA_ROOT
 
-from users.views import LoginView, ActiveUserView, RegisterView, ForgetPwdView, ResetView, ModifyPwdView, IndexView
+from users.views import IndexView
 
 urlpatterns = [
     # path('', TemplateView.as_view(template_name='user/index.html'), name='index'),
     path('', IndexView.as_view(), name='index'),
-    path('user/', include('users.urls')),
-    path('org/', include('organizations.urls')),
+    path('user/', include('users.urls')),  # 用户
+    path('org/', include('organizations.urls')),  # 机构
+    path('course/', include('courses.urls')),  # 课程
     # 配置上传文件的访问处理
     re_path('media/(?P<path>.*)', serve, {'document_root': MEDIA_ROOT}),
-    # path('login/', LoginView.as_view(), name='login'),  # 登录
-    # path('forget/', ForgetPwdView.as_view(), name='forget_pwd'),
-    # path('reset/', ResetView.as_view(), name='reset_pwd'),
-    # path('reset/', ModifyPwdView.as_view(), name='modify_pwd'),
-    # path('register/', RegisterView.as_view(), name='register'),  # 注册
     path('xadmin/', xadmin.site.urls),
-    # path('captcha/', include('captcha.urls')),  # 验证码
+    path('captcha/', include('captcha.urls')),  # 验证码
     # path('active/<active_code>/', ActiveUserView.as_view(), name='user_active'),
 
 ]
