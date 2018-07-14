@@ -34,20 +34,20 @@ class CourseListView(View):
         })
 
 
-# class CourseDetailView(View):
-#     def get(self, request, course_id):
-#         course = Course.objects.get(id=int(course_id))
-#         course.click_nums += 1
-#         course.save()
-#
-#         tag = course.tag
-#         if tag:
-#             relate_courses = Course.objects.filter(tag=tag)[1:2]
-#         else:
-#             relate_courses = []
-#
-#         return render(request, 'course/course-detail.html', {
-#             'course': course,
-#             'relate_coursers': relate_courses,
-#         })
+class CourseDetailView(View):
+    def get(self, request, course_id):
+        course = Course.objects.get(id=int(course_id))
+        course.click_nums += 1
+        course.save()
+
+        tag = course.tag
+        if tag:
+            relate_courses = Course.objects.filter(tag=tag)[1:2]
+        else:
+            relate_courses = []
+
+        return render(request, 'course/course-detail.html', {
+            'course': course,
+            'relate_coursers': relate_courses,
+        })
 

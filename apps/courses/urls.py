@@ -4,11 +4,11 @@
 # @site  : https://github.com/SunmoonSan
 from django.urls import path, include, re_path
 
-from .views import CourseListView
+from .views import CourseListView, CourseDetailView
 
 app_name='course'
 urlpatterns = [
     # path('login/', LoginView.as_view(), name='login'),  # 登录
     path('list/', CourseListView.as_view(), name='course_list'),
-    # path('detail/', CourseDetailView.as_view(), name='course_detail')
+    path('detail/<int:course_id>', CourseDetailView.as_view(), name='course_detail')
 ]
