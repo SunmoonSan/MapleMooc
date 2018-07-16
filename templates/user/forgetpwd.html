@@ -26,9 +26,7 @@
             <form id="jsFindPwdForm" method="post" action="{% url 'user:forget_pwd' %}" autocomplete="off">
                 <div class="form-group marb20 {% if forget_form.email.errors %} errorput{% endif %} ">
                     <label>帐&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号</label>
-                    <input type="text" id="account" name="email" value="
-                            {% comment %}{% ifnotequal None forget_form.email.value %}{{ forget_form.email.value }}{% endifnotequal %}{% endcomment %}"
-                           placeholder="邮箱"/>
+                    <input type="text" id="account" name="email" placeholder="邮箱"/>
                 </div>
                 <div class="form-group captcha1 marb38 {% if forget_form.captcha.errors %} errorput{% endif %}">
                     <label>验&nbsp;证&nbsp;码</label>

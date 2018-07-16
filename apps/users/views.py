@@ -1,6 +1,8 @@
+import json
+
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib import auth
 from django.contrib.auth.backends import ModelBackend
@@ -11,7 +13,7 @@ from django.views.generic import View
 from courses.models import Course
 from organizations.models import CourseOrg
 from users.models import UserProfile, EmailVerifyRecord, Banner
-from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm
+from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm, ActiveForm, UserInfoForm, UploadImageForm
 from utils.email_send import send_register_email
 
 
@@ -29,7 +31,10 @@ class CustomBackend(ModelBackend):
 class LoginView(View):
 
     def get(self, request):
-        return render(request, 'user/login.html', {})
+        redirect_url = request.GET.get('next', '')
+        return render(request, 'user/login.html', {
+            'redirect_url': redirect_url,
+        })
 
     def post(self, request):
         login_form = LoginForm(request.POST)
@@ -38,17 +43,17 @@ class LoginView(View):
             _password = request.POST.get('password', '')
             user = auth.authenticate(username=_username, password=_password)
             if user is not None:
-                if user.is_active:
+                if user.is_active:  # 判断是否已激活
                     auth.login(request, user)
                     redirect_url = request.POST.get('next', '')
                     if redirect_url:
                         return HttpResponseRedirect(redirect_url)
-                    return HttpResponseRedirect(reverse("index"))
+                    return HttpResponseRedirect(reverse("index"))  # 跳转到首页
                     # return render(request, 'index.html')
                 else:
                     return render(request, 'user/login.html', {'msg': '邮箱尚未激活,请进入邮箱激活!'})
             else:
-                return render(request, 'user/login.html', {'msg': '用户名或密码错误'})
+                return render(request, 'user/login.html', {'msg': '用户名或密码错误!'})
         else:
             render(request, 'user/login.html', {'login_form': login_form})
 
@@ -73,7 +78,7 @@ class ActiveUserView(View):
                 user.save()
         else:
             return render(request, 'active_fail.html')
-        return render(request, 'login.html')
+        return render(request, 'user/login.html')
 
 
 # 注册
@@ -87,25 +92,37 @@ class RegisterView(View):
         register_form = RegisterForm(request.POST)
         if register_form.is_valid():
             username = request.POST.get('email', '')
+
+            if UserProfile.objects.filter(email=username):
+                return render(request, 'user/register.html', {
+                    'register_form': register_form,
+                    'msg': '用户已经存在了!'
+                })
+
             password = request.POST.get('password', '')
+
             userprofile = UserProfile()
             userprofile.username = username
             userprofile.email = username
-            userprofile.is_active = False
-            userprofile.password = make_password(password=password)
+            userprofile.is_active = False  # 未激活
+            userprofile.password = make_password(password=password)  # 加密
             userprofile.save()
 
+            # 发送激活邮件
             send_register_email(username, 'register')
-            return render(request, 'login.html')
+            return render(request, 'user/login.html')  # 跳转到登录页面
         else:
-            return render(request, 'register.html', {'register_form': register_form})
+            return render(request, 'user/register.html', {'register_form': register_form})
 
 
+# 忘记密码
 class ForgetPwdView(View):
 
     def get(self, request):
-        forget_form = ForgetForm()
-        return render(request, 'forgetpwd.html', {'forget_form': forget_form})
+        active_form = ForgetForm()
+        return render(request, 'user/forgetpwd.html', {
+            'active_form': active_form,
+        })
 
     def post(self, request):
         forget_form = ForgetForm(request.POST)
@@ -114,48 +131,84 @@ class ForgetPwdView(View):
             send_register_email(email, 'forget')
             return render(request, 'send_success.html')
         else:
-            return render(request, 'forgetpwd.html', {'forget_form': forget_form})
+            return render(request, 'user/forgetpwd.html', {'forget_form': forget_form})
 
 
+# 重置密码
 class ResetView(View):
     def get(self, request, active_code):
         all_records = EmailVerifyRecord.objects.filter(code=active_code)
+
+        active_form = ActiveForm()
         if all_records:
             for record in all_records:
                 email = record.email
-                return render(request, 'password_reset.html', {'email': email})
+                return render(request, 'user/password_reset.html', {'email': email})
         else:
             return render(request, 'active_fail.html')
 
-        return render(request, 'login.html')
+        return render(request, 'user/login.html')
 
 
+# 修改密码
 class ModifyPwdView(View):
     def post(self, request):
         modify_form = ModifyPwdForm(request.POST)
         if modify_form.is_valid():
             pwd1 = modify_form.data.get('password1', '')
             pwd2 = modify_form.data.get('password2', '')
-            email = modify_form.data.get('email', '')
+            active_code = modify_form.data.get('email', '')
             if pwd1 != pwd2:
-                return render(request, 'password_reset.html', {'email': email, 'msg': '密码不一致'})
+                return render(request, 'user/password_reset.html', {'email': email, 'msg': '密码不一致'})
+
+            all_record = EmailVerifyRecord.objects.filter(code=active_code)
+            for record in all_record:
+                email = record.email
             user = UserProfile.objects.get(email=email)
             user.password = make_password(pwd2)
             user.save()
-            return render(request, 'login.html')
+            return render(request, 'user/login.html')
         else:
             email = request.POST.get('email', '')
-            return render(request, 'password_reset.html', {'email': email, 'modify_form': modify_form})
+            return render(request, 'user/password_reset.html', {'email': email, 'modify_form': modify_form})
 
 
+# 用户信息
 class UserInfoView(LoginRequiredMixin, View):
 
     def get(self, request):
         return render(request, 'user/usercenter-info.html')
 
     def post(self, request):
-        print(request.POST)
-        return render(request, 'index.html')
+        user_info_form = UserInfoForm(request.POST, instance=request.user)
+        if user_info_form.is_valid():
+            user_info_form.save()
+            return HttpResponse(json.dumps({
+                'status': 'success'
+            }), content_type='application/json')
+
+        return render(request, 'user/index.html')
+
+
+# 上传用户头像
+class UploadImageView(LoginRequiredMixin, View):
+    login_url = '/user/login/'
+    redirect_field_name =  'next'
+
+    def post(self, request):
+        image_form = UploadImageForm(request.POST, request.FILES, instance=request.user)
+
+        if image_form.is_valid():
+            image_form.save()
+            return HttpResponse(json.dumps({
+                'status': 'success'
+            }), content_type='application/json')
+
+        else:
+            return HttpResponse(json.dumps({
+                'status': 'fail'
+            }), content_type='application/json')
+
 
 
 # 网站首页

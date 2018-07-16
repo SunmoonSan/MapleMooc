@@ -24,16 +24,17 @@
 			<div class="inforcon">
 				<div class="left" style="width:242px;">
                     <iframe id='frameFile' name='frameFile' style='display: none;'></iframe>
-                    <form class="clearfix" id="jsAvatarForm" enctype="multipart/form-data" autocomplete="off" method="post" action="/users/image/upload/" target='frameFile'>
+                    <form class="clearfix" id="jsAvatarForm" enctype="multipart/form-data" autocomplete="off" method="post" action="{% url 'user:image_upload' %}" target='frameFile'>
                         <label class="changearea" for="avatarUp">
                             <span id="avatardiv" class="pic">
-                                <img width="100" height="100" class="js-img-show" id="avatarShow" src="../media/image/2016/12/default_big_14.png"/>
+                                <img width="100" height="100" class="js-img-show" id="avatarShow" src="{{ MEDIA_URL }}{{ request.user.image }}"/>
                             </span>
                             <span class="fl upload-inp-box" style="margin-left:70px;">
                                 <span class="button btn-green btn-w100" id="jsAvatarBtn">修改头像</span>
                                 <input type="file" name="image" id="avatarUp" class="js-img-up"/>
                             </span>
                         </label>
+                        {% csrf_token %}  {# 每个form表单都要添加 #}
                     </form>
                     <div style="border-top:1px solid #eaeaea;margin-top:30px;">
                         <a class="button btn-green btn-w100" id="jsUserResetPwd" style="margin:80px auto;width:100px;">修改密码</a>
@@ -42,32 +43,33 @@
 				<form class="perinform" id="jsEditUserForm" autocomplete="off">
 					<ul class="right">
 						<li>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：
-                           <input type="text" name="nick_name" id="nick_name" value="mtianyan" maxlength="10">
+                           <input type="text" name="nick_name" id="nick_name" value="{{ request.user.username|default_if_none:'' }}" maxlength="10">
                             <i class="error-tips"></i>
                         </li>
 						<li>生&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日：
-                           <input type="text" id="birth_day" name="birday" value="2018年1月8日" readonly="readonly"/>
+                           <input type="text" id="birth_day" name="birday" value="{{ request.user.birthday|date:'Y-m-d' }}" readonly="readonly"/>
                             <i class="error-tips"></i>
 						</li>
 						<li>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：
-							<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio"  name="gender" value="male" >男</label>
-							<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="gender" value="female" checked="checked">女</label>
+							<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio"  name="gender" value="male" {% ifequal request.user.gender "male" %}checked="checked"{% endifequal %} >男</label>
+							<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="gender" value="female" {% ifequal request.user.gender "female" %}checked="checked"{% endifequal %}>女</label>
 						</li>
 						<li class="p_infor_city">地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址：
-                            <input type="text" name="address" id="address" placeholder="请输入你的地址" value="西安" maxlength="10">
+                            <input type="text" name="address" id="address" placeholder="请输入你的地址" value="{{ request.user.address|default_if_none:'' }}" maxlength="10">
 						    <i class="error-tips"></i>
                         </li>
 						<li>手&nbsp;&nbsp;机&nbsp;&nbsp;号：
-                            <input type="text" name="mobile" id="mobile" placeholder="请输入你的手机号码" value="" maxlength="10">
+                            <input type="text" name="mobile" id="mobile" placeholder="请输入你的手机号码" value="{{ request.user.mobile|default_if_none:'' }}" maxlength="10">
                         </li>
                         <li>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱：
-                        	<input class="borderno" type="text" name="email" readonly="readonly" value="1147727180@qq.com"/>
+                        	<input class="borderno" type="text" name="email" readonly="readonly" value="{{ request.user.email }}"/>
                             <span class="green changeemai_btn">[修改]</span>
                     	</li>
 						<li class="button heibtn">
 							<input type="button" id="jsEditUserBtn" value="保存">
 						</li>
 					</ul>
+                {% csrf_token %}
 				</form>
 			</div>
 		</div>

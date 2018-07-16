@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 import xadmin
 from MapleMooc.settings import MEDIA_ROOT
 from users.views import LoginView, ForgetPwdView, ResetView, ModifyPwdView, RegisterView, ActiveUserView, IndexView, \
-    LogoutView, UserInfoView
+    LogoutView, UserInfoView, UploadImageView
 
 app_name='user'
 urlpatterns = [
@@ -19,10 +19,11 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),  # 注册
     path('forget/', ForgetPwdView.as_view(), name='forget_pwd'),
     path('reset/', ResetView.as_view(), name='reset_pwd'),
-    path('reset/', ModifyPwdView.as_view(), name='modify_pwd'),
+    path('modify_pwd/', ModifyPwdView.as_view(), name='modify_pwd'),
     path('userinfo/', UserInfoView.as_view(), name='user_info'),
+    # 上传用户头像
+    path('image/upload/', UploadImageView.as_view(), name='image_upload'),
     path('xadmin/', xadmin.site.urls),
-
     path('active/<active_code>/', ActiveUserView.as_view(), name='user_active'),
 
 ]
