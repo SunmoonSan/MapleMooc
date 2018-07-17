@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import PageNotAnInteger
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib import auth
@@ -9,8 +10,10 @@ from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
 from django.urls import reverse
 from django.views.generic import View
+from pure_pagination import Paginator
 
 from courses.models import Course
+from operations.models import UserCourse, UserMessage
 from organizations.models import CourseOrg
 from users.models import UserProfile, EmailVerifyRecord, Banner
 from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm, ActiveForm, UserInfoForm, UploadImageForm
@@ -159,7 +162,7 @@ class ModifyPwdView(View):
             pwd2 = modify_form.data.get('password2', '')
             active_code = modify_form.data.get('email', '')
             if pwd1 != pwd2:
-                return render(request, 'user/password_reset.html', {'email': email, 'msg': '密码不一致'})
+                return render(request, 'user/password_reset.html', {'email': active_code, 'msg': '密码不一致'})
 
             all_record = EmailVerifyRecord.objects.filter(code=active_code)
             for record in all_record:
@@ -192,8 +195,8 @@ class UserInfoView(LoginRequiredMixin, View):
 
 # 上传用户头像
 class UploadImageView(LoginRequiredMixin, View):
-    login_url = '/user/login/'
-    redirect_field_name =  'next'
+    login_url = '/login/'
+    redirect_field_name = '/user/login'
 
     def post(self, request):
         image_form = UploadImageForm(request.POST, request.FILES, instance=request.user)
@@ -209,6 +212,60 @@ class UploadImageView(LoginRequiredMixin, View):
                 'status': 'fail'
             }), content_type='application/json')
 
+
+class UpdatePwdView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = '/user/login'
+
+    def post(self, request):
+        modify_pwd_form = ModifyPwdForm(request.POST)
+        if modify_pwd_form.is_valid():
+            pwd1 = request.POST.get('password1', '')
+            pwd2 = request.POST.get('password2', '')
+
+            if pwd1 != pwd2:
+                return HttpResponse(json.dumps({
+                    'status': 'fail',
+                    'msg': '密码不一致!'
+                }), content_type='application/json')
+
+            user = request.user
+            user.password = make_password(pwd1)
+            user.save()
+            return HttpResponse(json.dumps({
+                'status': 'success'
+            }), content_type='application/json')
+        else:
+            return HttpResponse(json.dumps(modify_pwd_form.errors),
+                                content_type='application/json')
+
+
+# 我的课程
+class MyCourseView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        user_course = UserCourse.objects.filter(user=request.user)
+        return render(request, 'user/usercenter-mycourse.html', )
+
+
+class MyMessageView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        all_message = UserMessage.objects.filter(user=request.user.id)  # user是整形id
+        all_unread_message = UserMessage.objects.filter(user=request.user.id, has_read=False)
+        for message in all_unread_message:
+            message.has_read = True
+            message.save()
+
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+        p = Paginator(all_message, 4)
+        messages = p.page(page)
+        return render(request, 'user/usercenter-message.html', {
+            'messages': messages
+        })
 
 
 # 网站首页
@@ -227,6 +284,9 @@ class IndexView(View):
             "banner_courses": banner_courses,
             "course_orgs": course_orgs,
         })
+
+
+
 
 
 
