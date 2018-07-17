@@ -39,8 +39,10 @@ class UserFavorite(models.Model):
         verbose_name_plural = verbose_name
 
 
+# 用户消息表
 class UserMessage(models.Model):
-    user = models.IntegerField(default=0, verbose_name=u'接受用户')
+    # user为整型, 为0就群发所有用户, 不为0就发给对应id的用户
+    user = models.IntegerField(default=0, verbose_name=u'接收用户')
     message = models.CharField(max_length=500, verbose_name=u'消息内容')
     has_read = models.BooleanField(default=False, verbose_name=u'是否已读')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name=u'添加时间')
@@ -48,6 +50,9 @@ class UserMessage(models.Model):
     class Meta:
         verbose_name = u'用户消息'
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '用户({0})接收了{1}'.format(self.user, self.message)
 
 
 class UserCourse(models.Model):
