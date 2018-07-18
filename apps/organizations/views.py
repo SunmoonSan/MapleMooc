@@ -5,22 +5,66 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.http import HttpResponse
 
+from pure_pagination import Paginator, PageNotAnInteger
 
-# 课程机构列表功能
 from operations.models import UserFavorite
 from organizations.forms import UserAskForm
-from organizations.models import CourseOrg, CityDict
-
-from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
+from organizations.models import CourseOrg, CityDict, Teacher
 
 
+# 授课教师
+class TeacherListView(View):
+
+    def get(self, request):
+        all_teacher = Teacher.objects.all()
+        sort = request.GET.get('sort', '')
+
+        if sort and sort == 'hot':
+            all_teacher = all_teacher.order_by('click_nums')
+
+        sorted_teacher = Teacher.objects.all().order_by('click_nums')[:3]  # 人气前3位
+
+        try:
+            page = request.GET.get('page', 1)
+        except PageNotAnInteger:
+            page = 1
+            # 这里指从allorg中取五个出来，每页显示5个
+        p = Paginator(all_teacher, 1, request=request)
+        teachers = p.page(page)
+
+        return render(request, 'org/teachers-list.html', {
+            'teachers': teachers,
+            'sorted_teacher': sorted_teacher,
+            'sort': sort,
+        })
+
+
+# 教师详情页
+class TeacherDetailView(View):
+
+    def get(self, request, teacher_id):
+        teacher = Teacher.objects.get(pk=teacher_id)
+        teacher.click_nums += 1  # 点击量加1
+        teacher.save()
+
+        teach_courses = teacher.course_set.all()  # 该老师所教课程
+
+        sorted_teacher = Teacher.objects.all().order_by('click_nums')[:3]  # 人气前3位
+
+        return render(request, 'org/teacher-detail.html', {
+            'teacher': teacher,
+            'teach_courses': teach_courses,
+            'sorted_teacher': sorted_teacher,
+        })
+
+
+# 授课机构列表
 class OrgView(View):
 
     def get(self, request):
         all_orgs = CourseOrg.objects.all()
 
         all_cities = CityDict.objects.all()
-        print(all_orgs, all_cities)
 
         hot_orgs = all_orgs.order_by('-click_nums')[:3]
 
