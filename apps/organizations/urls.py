@@ -2,12 +2,18 @@
 # -*- coding: utf-8 -*-
 # @desc  : Created by San on 2018-07-11 10:40
 # @site  : https://github.com/SunmoonSan
-from django.urls import path, re_path
+from django.urls import path
 
-from .views import OrgView, AddUserAskView, OrgHomeView, OrgCourseView, OrgDescView, OrgTeacherView
+from .views import OrgView, AddUserAskView, OrgHomeView, OrgCourseView, OrgDescView, OrgTeacherView, TeacherListView, \
+    TeacherDetailView
 
 app_name = 'org'
 urlpatterns = [
+    # 教师栏列表
+    path('teacher_list/', TeacherListView.as_view(), name='teacher_list'),
+    # 教师详情页
+    path('teacher_detail/<int:teacher_id>/', TeacherDetailView.as_view(), name='teacher_detail'),
+    # 机构列表
     path('list/', OrgView.as_view(), name='org_list'),
     path('add_ask/', AddUserAskView.as_view(), name='add_ask'),
     # home页面,取纯数字

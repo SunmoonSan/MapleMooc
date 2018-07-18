@@ -20,7 +20,7 @@ from django.views.static import serve
 import xadmin
 from MapleMooc.settings import MEDIA_ROOT
 
-from users.views import IndexView
+from users.views import IndexView, ActiveUserView, ResetView
 
 urlpatterns = [
     # path('', TemplateView.as_view(template_name='user/index.html'), name='index'),
@@ -28,10 +28,13 @@ urlpatterns = [
     path('user/', include('users.urls')),  # 用户
     path('org/', include('organizations.urls')),  # 机构
     path('course/', include('courses.urls')),  # 课程
+    # path('teacher/', include('organizations.urls')),  # 讲师
     # 配置上传文件的访问处理
     re_path('media/(?P<path>.*)', serve, {'document_root': MEDIA_ROOT}),
     path('xadmin/', xadmin.site.urls),
     path('captcha/', include('captcha.urls')),  # 验证码
-    # path('active/<active_code>/', ActiveUserView.as_view(), name='user_active'),
+    path('active/<active_code>/', ActiveUserView.as_view(), name='user_active'),
+    # 重置密码urlc ：用来接收来自邮箱的重置链接
+    re_path('reset/(?P<active_code>.*)/', ResetView.as_view(), name="reset_pwd"),
 
 ]
