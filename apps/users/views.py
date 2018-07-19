@@ -13,8 +13,8 @@ from django.views.generic import View
 from pure_pagination import Paginator
 
 from courses.models import Course
-from operations.models import UserCourse, UserMessage
-from organizations.models import CourseOrg
+from operations.models import UserCourse, UserMessage, UserFavorite
+from organizations.models import CourseOrg, Teacher
 from users.models import UserProfile, EmailVerifyRecord, Banner
 from .forms import LoginForm, RegisterForm, ForgetForm, ModifyPwdForm, ActiveForm, UserInfoForm, UploadImageForm
 from utils.email_send import send_register_email
@@ -213,6 +213,7 @@ class UploadImageView(LoginRequiredMixin, View):
             }), content_type='application/json')
 
 
+# 个人中心修改密码
 class UpdatePwdView(LoginRequiredMixin, View):
     login_url = '/login/'
     redirect_field_name = '/user/login'
@@ -248,6 +249,43 @@ class MyCourseView(LoginRequiredMixin, View):
         return render(request, 'user/usercenter-mycourse.html', )
 
 
+class MyFavoriteView(LoginRequiredMixin, View):
+    def get(self, request):
+        fav_type = request.GET.get('fav_type', 1)
+
+        if fav_type == '2':  # 收藏课程机构
+            favorite_orgs = UserFavorite.objects.filter(user=request.user, fav_type=2)
+
+            orgs = []
+            for org in favorite_orgs:
+                o = CourseOrg.objects.get(pk=org.fav_id)
+                orgs.append(o)
+            return render(request, 'user/usercenter-fav-org.html', {
+                'orgs': orgs
+            })
+        elif fav_type == '3':  # 收藏授课教师
+            favorite_teachers = UserFavorite.objects.filter(user=request.user, fav_type=3)
+
+            teachers = []
+            for teacher in favorite_teachers:
+                t = Teacher.objects.get(pk=teacher.fav_id)
+                teachers.append(t)
+            return render(request, 'user/usercenter-fav-teacher.html', {
+                'teachers': teachers,
+            })
+
+        favorite_course = UserFavorite.objects.filter(user=request.user, fav_type=1)
+
+        courses = []
+        for course in favorite_course:
+            c = Course.objects.get(pk=course.fav_id)
+            courses.append(c)
+        return render(request, 'user/usercenter-fav-course.html', {
+            'courses': courses
+        })
+
+
+# 我的消息
 class MyMessageView(LoginRequiredMixin, View):
 
     def get(self, request):
@@ -284,9 +322,3 @@ class IndexView(View):
             "banner_courses": banner_courses,
             "course_orgs": course_orgs,
         })
-
-
-
-
-
-

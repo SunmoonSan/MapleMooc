@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.views.generic import View
 from pure_pagination import Paginator
 
-from operations.models import CourseMoments
+from operations.models import CourseMoments, UserFavorite
 from .models import Course
 
 
@@ -52,9 +52,20 @@ class CourseDetailView(View):
         else:
             relate_courses = []
 
+        has_fav_course = False  # 收藏课程
+        has_fav_org = False  # 收藏机构
+
+        if request.user.is_authenticated:
+            if UserFavorite.objects.filter(user=request.user, fav_id=course_id, fav_type=1):
+                has_fav_course = True
+            if UserFavorite.objects.filter(user=request.user, fav_id=course.course_org.id, fav_type=2):
+                has_fav_org = True
+
         return render(request, 'course/course-detail.html', {
             'course': course,
             'relate_coursers': relate_courses,
+            'has_fav_course': has_fav_course,
+            'has_fav_org': has_fav_org
         })
 
 
