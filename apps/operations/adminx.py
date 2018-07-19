@@ -4,7 +4,13 @@
 # @site  : https://github.com/SunmoonSan
 import xadmin
 
-from operations.models import UserMessage
+from operations.models import UserMessage, UserFavorite
+
+
+class UserFavoriteAdmin:
+    list_display = ['user', 'fav_id', 'fav_type', 'add_time']
+    search_fields = ['user', 'fav_id', 'fav_type']
+    list_filter = ['user', 'fav_id', 'fav_type', 'add_time']
 
 
 class UserMessageAdmin:
@@ -13,4 +19,5 @@ class UserMessageAdmin:
     list_filter = ['user', 'message', 'has_read', 'add_time']
 
 
+xadmin.site.register(UserFavorite, UserFavoriteAdmin)
 xadmin.site.register(UserMessage, UserMessageAdmin)

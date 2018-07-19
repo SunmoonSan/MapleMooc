@@ -3162,7 +3162,7 @@ footer .footer .line {
     color: #fff;
 }
 
-.collectionbtn.collected {
+.collectionbtn .collected {
     background: #ff7800;
     cursor: pointer;
     color: #fff !important;
@@ -8226,11 +8226,11 @@ table .upload-btn {
     color: #fff;
 }
 
-.collectionbtn.collected {
+/*.collectionbtn .collected {
     background: #ff7800;
     cursor: pointer;
     color: #fff !important;
-}
+}*/
 
 .butler-company-box .clear {
     width: 80%;

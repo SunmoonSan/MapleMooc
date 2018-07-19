@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 # Create your models here.
 from courses.models import Course
@@ -28,7 +27,8 @@ class CourseMoments(models.Model):
         verbose_name_plural = verbose_name
 
 
-class UserFavorite(models.Model):
+# 用户收藏表
+class  UserFavorite(models.Model):
     user = models.ForeignKey(UserProfile, verbose_name=u'用户', on_delete=models.CASCADE)
     fav_id = models.IntegerField(default=0, verbose_name=u'数据id')
     fav_type = models.IntegerField(choices=((1, '课程'), (2, '课程机构'), (3, '讲师')), default=1, verbose_name=u'收藏类型')
@@ -37,6 +37,9 @@ class UserFavorite(models.Model):
     class Meta:
         verbose_name = u'用户收藏'
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '用户({0})收藏了{1}'.format(self.user, self.fav_type)
 
 
 # 用户消息表
