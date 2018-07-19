@@ -44,25 +44,44 @@
                     <ul>
                         <li>
                             <h2>机构类别</h2>
+
                             <div class="cont">
-                                <a href="?city="><span class="active2">全部</span></a>
+                                <a href="?city={{ city_id }}&keywords={{ search_keywords }}">
+                                    <span class="{% ifequal category "" %}active2{% endifequal %}">全部</span>
+                                </a>
 
-                                <a href="?ct=pxjg&city="><span class="">培训机构</span></a>
+                                <a href="?ct=pxjg&city={{ city.id }}&keywords={{ search_keywords }}">
+                                    <span class="{% ifequal category "pxjg" %}active2{% endifequal %}">培训机构</span>
+                                </a>
 
-                                <a href="?ct=gx&city="><span class="">高校</span></a>
+                                <a href="?ct=gx&city={{ city_id }}&keywords={{ search_keywords }}">
+                                    <span class="{% ifequal category "gx" %}active2{% endifequal %}">高校</span>
+                                </a>
 
-                                <a href="?ct=gr&city="><span class="">个人</span></a>
+                                <a href="?ct=gr&city={{ city_id }}&keywords={{ search_keywords }}">
+                                    <span class="{% ifequal category "gr" %}active2{% endifequal %}">个人</span>
+                                </a>
 
                             </div>
+
                         </li>
+
                         <li>
                             <h2>所在地区</h2>
                             <div class="more">更多</div>
                             <div class="cont">
-                                <a href="?ct="><span class="active2">全部</span></a>
+                                <a href="?ct=">
+                                    <span class="{% ifequal city_id "" %}active2{% endifequal %}">全部</span>
+                                </a>
                                 {# 所属城市列表 #}
                                 {% for city in all_city %}
-                                    <a href="?city=1&ct="><span class="">{{ city.name }}</span></a>
+                                    <a href="?city={{ city.id }}&ct={{ category }}">
+                                        <span class="{% ifequal city.id|stringformat:'i' city_id %}
+                                        active2
+                                        {% endifequal %}">
+                                            {{ city.name }}
+                                        </span>
+                                    </a>
                                 {% endfor %}
 
                             </div>
@@ -74,16 +93,22 @@
                     <div class="layout">
                         <div class="head">
                             <ul class="tab_header">
-                                <li class="active"><a href="?ct=&city=">全部</a></li>
-                                <li class=""><a href="?sort=students&ct=&city=">学习人数 &#8595;</a></li>
-                                <li class=""><a href="?sort=courses&ct=&city=">课程数 &#8595;</a></li>
+                                <li class="{% ifequal sort "" %}active{% endifequal %}">
+                                    <a href="?ct=&city=">全部</a>
+                                </li>
+                                <li class="{% ifequal sort "students" %}active{% endifequal %}">
+                                    <a href="?sort=students&ct=&city=">学习人数 &#8595;</a>
+                                </li>
+                                <li class="{% ifequal sort "courses" %}active{% endifequal %}">
+                                    <a href="?sort=courses&ct=&city=">课程数 &#8595;</a>
+                                </li>
                             </ul>
                         </div>
                         {#  课程机构列表  #}
                         {% for org in all_orgs.object_list %}
                             <dl class="des difdes">
                                 <dt>
-                                    <a href="org-detail-homepage.html">
+                                    <a href="{% url 'org:org_home' org.id %}">
                                         <img width="200" height="120" class="scrollLoading"
                                              data-url="{{ MEDIA_URL }}{{ org.image }}"/>
                                     </a>
@@ -166,31 +191,15 @@
             <div class="right companyrank layout">
                 <div class="head">授课机构排名</div>
 
-
-                <dl class="des">
-                    <dt class="num fl">1</dt>
-                    <dd>
-                        <a href="/company/2/"><h1>慕课网</h1></a>
-                        <p>北京市</p>
-                    </dd>
-                </dl>
-
-                <dl class="des">
-                    <dt class="num fl">2</dt>
-                    <dd>
-                        <a href="/company/2/"><h1>慕课网2</h1></a>
-                        <p>深圳市</p>
-                    </dd>
-                </dl>
-
-                <dl class="des">
-                    <dt class="num fl">3</dt>
-                    <dd>
-                        <a href="/company/2/"><h1>北京大学</h1></a>
-                        <p>北京市</p>
-                    </dd>
-                </dl>
-
+                {% for hot_org in hot_orgs %}
+                    <dl class="des">
+                        <dt class="num fl">1</dt>
+                        <dd>
+                            <a href="{% url 'org:org_course' hot_org.id %}"><h1>{{ hot_org.name }}</h1></a>
+                            <p>{{ hot_org.address }}</p>
+                        </dd>
+                    </dl>
+                {% endfor %}
 
             </div>
         </div>
@@ -208,10 +217,10 @@
                     data: $('#jsStayForm').serialize(),
                     async: true,
                     success: function (data) {
-                        if (data.status == 'success') {
+                        if (data.status === 'success') {
                             $('#jsStayForm')[0].reset();
                             alert("提交成功")
-                        } else if (data.status == 'fail') {
+                        } else if (data.status === 'fail') {
                             $('#jsCompanyTips').html(data.msg)
                         }
                     },

@@ -1,7 +1,48 @@
 {% extends 'org/org-base.html' %}
 {% load staticfiles %}
 {% block title %}
-讲师团队
+    讲师团队
+{% endblock %}
+
+{% block companyheader %}
+    <div class="middle companyheader">
+        <div class="wp">
+            <img class="fl" style="width: 112px;height: 103px"
+                 src="{{ MEDIA_URL }}{{ course_org.image }}"/>
+            <div class="head fl">
+                <h1>
+                    {{ course_org.name }}
+                    <img src="{% static 'images/authentication.png' %}"/>
+                    <img src="{% static 'images/gold.png' %}"/>
+                </h1>
+                <p class="fl">
+                    <span class="fl" style="margin-top:8px;color:#848484;">推荐指数： </span>
+                    <span class="precision company-credit" data-star-scope="5.0"></span>
+                    <span class="key">5.0</span>
+                </p>
+            </div>
+            <div class="btn fr collectionbtn  notlogin" data-favid="22" data-fav-type="1">
+                {% if has_fav %}
+                    已收藏
+                {% else %}
+                    收藏
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block navigation %}
+    <section>
+        <div class="wp">
+            <ul class="crumbs">
+                <li><a href="{% url 'index' %}">首页</a>></li>
+                <li><a href="{% url 'org:org_list' %}">课程机构</a>></li>
+                <li>机构讲师</li>
+            </ul>
+        </div>
+    </section>
 {% endblock %}
 
 {% block content %}
