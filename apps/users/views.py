@@ -107,12 +107,12 @@ class RegisterView(View):
             userprofile = UserProfile()
             userprofile.username = username
             userprofile.email = username
-            userprofile.is_active = False  # 未激活
+            userprofile.is_active = True  # 未激活
             userprofile.password = make_password(password=password)  # 加密
             userprofile.save()
 
             # 发送激活邮件
-            send_register_email(username, 'register')
+            # send_register_email(username, 'register')  阿里云禁用邮箱25端口
             return render(request, 'user/login.html')  # 跳转到登录页面
         else:
             return render(request, 'user/register.html', {'register_form': register_form})

@@ -97,7 +97,7 @@ $(function () {
                     Dml.fun.showValidateError($("#pwd"), data.password1);
                 } else if (data.password2) {
                     Dml.fun.showValidateError($("#repwd"), data.password2);
-                } else if (data.status == "success") {
+                } else if (data.status === "success") {
                     Dml.fun.showTipsDialog({
                         title: '提交成功',
                         h2: '修改密码成功，请重新登录!',
@@ -142,25 +142,27 @@ $(function () {
     });
 
     laydate({
-        elem: '#birth_day',
+        elem: '#birthday',
         format: 'YYYY-MM-DD',
         max: laydate.now()
     });
 
     verify(
         [
-            {id: '#nick_name', tips: Dml.Msg.epNickName, require: true}
+            {id: '#nickname', tips: Dml.Msg.epNickName, require: true}
         ]
     );
+
     //保存个人资料
     $('#jsEditUserBtn').on('click', function () {
         var _self = $(this),
             $jsEditUserForm = $('#jsEditUserForm');
         verify = verifySubmit(
             [
-                {id: '#nick_name', tips: Dml.Msg.epNickName, require: true}
+                {id: '#nickname', tips: Dml.Msg.epNickName, require: true}
             ]
         );
+
         if (!verify) {
             return;
         }
@@ -168,7 +170,7 @@ $(function () {
             cache: false,
             type: 'post',
             dataType: 'json',
-            url: "/users/info/",
+            url: "/user/info/",
             data: $jsEditUserForm.serialize(),
             async: true,
             beforeSend: function (XMLHttpRequest) {
@@ -176,10 +178,10 @@ $(function () {
                 _self.attr('disabled', true);
             },
             success: function (data) {
-                if (data.nick_name) {
-                    _showValidateError($('#nick_name'), data.nick_name);
+                if (data.nickname) {
+                    _showValidateError($('#nickname'), data.nickname);
                 } else if (data.birday) {
-                    _showValidateError($('#birth_day'), data.birday);
+                    _showValidateError($('#birthday'), data.birthday);
                 } else if (data.address) {
                     _showValidateError($('#address'), data.address);
                 } else if (data.status == "failure") {

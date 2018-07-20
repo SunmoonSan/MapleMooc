@@ -76,7 +76,7 @@
                             </ul>
                         </div>
 
-                        <div class="selectContainer fl">
+                        {% comment %}<div class="selectContainer fl">
                             <span class="selectOption" id="jsSelectOption" data-value="course">
                                 公开课
                             </span>
@@ -85,7 +85,7 @@
                                 <li data-value="org">课程机构</li>
                                 <li data-value="teacher">授课老师</li>
                             </ul>
-                        </div>
+                        </div>{% endcomment %}
                         <input id="search_keywords" class="fl" type="text" value="" placeholder="请输入搜索内容"/>
                         <img class="search_btn fr" id="jsSearchBtn" src="{% static 'images/search_btn.png' %}"/>
                     </div>
