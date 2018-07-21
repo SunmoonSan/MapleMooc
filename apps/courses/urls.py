@@ -4,7 +4,8 @@
 # @site  : https://github.com/SunmoonSan
 from django.urls import path, include, re_path
 
-from .views import CourseListView, CourseDetailView, CourseInfoView, CourseCommentListView, CourseAddCommentView
+from .views import CourseListView, CourseDetailView, CourseInfoView, CourseCommentListView, CourseAddCommentView, \
+    VideoPlayView
 
 app_name='course'
 urlpatterns = [
@@ -13,5 +14,6 @@ urlpatterns = [
     path('detail/<int:course_id>', CourseDetailView.as_view(), name='course_detail'),
     path('info/<int:course_id>', CourseInfoView.as_view(), name='course_info'),
     path('comment/<int:course_id>', CourseCommentListView.as_view(), name='course_comment_list'),
-    path('add_comment', CourseAddCommentView.as_view(), name='course_add_comment')
+    path('add_comment', CourseAddCommentView.as_view(), name='course_add_comment'),
+    path('video-play/<int:video_id>/', VideoPlayView.as_view(), name='video_play'),
 ]

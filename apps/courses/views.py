@@ -8,7 +8,7 @@ from django.views.generic import View
 from pure_pagination import Paginator
 
 from operations.models import CourseMoments, UserFavorite
-from .models import Course
+from .models import Course, Video
 
 
 # 课程列表
@@ -119,6 +119,18 @@ class CourseAddCommentView(View):
                 'status': 'fail',
                 'msg': '评论失败!',
             }), content_type='application/json')
+
+
+class VideoPlayView(LoginRequiredMixin, View):
+    def get(self, request, video_id):
+        # print('video_id', video_id)
+        video = Video.objects.get(id=video_id)
+        # print(video)
+        course = video.lesson.course
+        # print(course)
+        return render(request, 'course/course-play.html', {
+            'course': course,
+        })
 
 
 

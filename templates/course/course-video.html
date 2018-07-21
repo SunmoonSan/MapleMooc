@@ -21,7 +21,7 @@
                 <ul>
                     <li><a href="{% url 'index' %}">首页</a></li>
                     <li class="active">
-                        <a href="course-list.html">
+                        <a href="{% url 'course:course_list' %}">
                             公开课<img class="hot" src="{% static 'images/nav_hot.png' %}">
                         </a>
                     </li>
@@ -97,16 +97,16 @@
 
                         <div class="mod-chapters">
 
-                            {% for chapter in course.lesson_set.get_queryset %}
+                            {% for lesson in course.lesson_set.get_queryset %}
                             <div class="chapter chapter-active">
                                 <h3>
-                                    <strong><i class="state-expand"></i>{{ chapter.name }}</strong>
+                                    <strong><i class="state-expand"></i>{{ lesson.name }}</strong>
                                 </h3>
                                 <ul class="video">
 
-                                    {% for video in chapter.video_set.get_queryset %}
+                                    {% for video in lesson.video_set.get_queryset %}
                                     <li>
-                                        <a target="_blank" href='{{ video.url }}' class="J-media-item studyvideo">
+                                        <a target="_blank" href="{% url 'course:video_play' video.id %}" class="J-media-item studyvideo">
                                             {{ video.name }} ({{ video.learn_times }}min)
                                             <i class="study-state"></i>
                                         </a>
